@@ -3,11 +3,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors } from '../theme/colors';
 
-export type TabKey = 'dashboard' | 'input' | 'history';
+export type TabKey = 'dashboard' | 'input' | 'trends' | 'history';
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'dashboard', label: 'Dashboard', icon: '📊' },
   { key: 'input', label: 'New', icon: '➕' },
+  { key: 'trends', label: 'Trends', icon: '📈' },
   { key: 'history', label: 'History', icon: '🕑' },
 ];
 

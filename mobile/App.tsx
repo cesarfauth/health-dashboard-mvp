@@ -7,6 +7,7 @@ import { HealthDataProvider } from './src/context/HealthDataContext';
 import { DashboardScreen } from './src/screens/DashboardScreen';
 import { HistoryScreen } from './src/screens/HistoryScreen';
 import { InputScreen } from './src/screens/InputScreen';
+import { TrendScreen } from './src/screens/TrendScreen';
 import { colors } from './src/theme/colors';
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
           {tab === 'input' && (
             <InputScreen onCreated={() => setTab('dashboard')} />
           )}
+          {tab === 'trends' && <TrendScreen />}
           {tab === 'history' && <HistoryScreen />}
         </View>
 

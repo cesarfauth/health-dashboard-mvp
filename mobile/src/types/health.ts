@@ -49,3 +49,38 @@ export interface ValidationErrorResponse {
   message: string;
   errors: Record<string, string[]>;
 }
+
+// --- Trend analysis (differential) ---
+
+export type TrendDirection = 'up' | 'down' | 'stable';
+
+export interface TrendMetric {
+  label: string;
+  unit: string;
+  first: number;
+  latest: number;
+  average: number;
+  min: number;
+  max: number;
+  change_pct: number;
+  direction: TrendDirection;
+}
+
+export interface TrendInsufficient {
+  type: 'trend';
+  status: 'insufficient_data';
+  records_analyzed: number;
+  required: number;
+  message: string;
+}
+
+export interface TrendOk {
+  type: 'trend';
+  status: 'ok';
+  records_analyzed: number;
+  period: { from: string; to: string; days_span: number };
+  metrics: Record<BiomarkerKey, TrendMetric>;
+  recommendation: AiRecommendation;
+}
+
+export type TrendResult = TrendInsufficient | TrendOk;

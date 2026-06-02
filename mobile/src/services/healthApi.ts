@@ -3,6 +3,7 @@ import axios from 'axios';
 import type {
   BiomarkerInput,
   HealthRecord,
+  TrendResult,
   ValidationErrorResponse,
 } from '../types/health';
 import { apiClient } from './apiClient';
@@ -43,6 +44,19 @@ export async function fetchHistory(limit = 10): Promise<HealthRecord[]> {
     const { data } = await apiClient.get<Wrapped<HealthRecord[]>>(
       '/health-records',
       { params: { limit } },
+    );
+    return data.data;
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+
+export async function requestTrendAnalysis(
+  recordId: number,
+): Promise<TrendResult> {
+  try {
+    const { data } = await apiClient.post<Wrapped<TrendResult>>(
+      `/health-records/${recordId}/trend-analysis`,
     );
     return data.data;
   } catch (error) {
