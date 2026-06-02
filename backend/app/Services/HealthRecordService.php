@@ -35,9 +35,12 @@ class HealthRecordService
         $prompt = $this->prompts->forSnapshot($record);
         $result = $this->claude->analyze($prompt);
 
-        $this->repository->attachRecommendation($record, $result->toPersistenceArray());
+        $recommendation = $this->repository->attachRecommendation($record, $result->toPersistenceArray());
 
-        return $record->load('latestRecommendation');
+        // Expose the just-created recommendation without an extra query.
+        $record->setRelation('latestRecommendation', $recommendation);
+
+        return $record;
     }
 
     /**
