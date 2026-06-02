@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\AiRecommendationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AiRecommendation extends Model
 {
-    /** @use HasFactory<\Database\Factories\AiRecommendationFactory> */
+    /** @use HasFactory<AiRecommendationFactory> */
     use HasFactory;
 
     protected $fillable = [
