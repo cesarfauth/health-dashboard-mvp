@@ -4,7 +4,7 @@ set -e
 cd /var/www
 
 echo "[entrypoint] Ensuring PHP dependencies are installed..."
-if [ ! -d vendor ]; then
+if [ ! -f vendor/autoload.php ]; then
     composer install --no-interaction --prefer-dist --optimize-autoloader
 fi
 
