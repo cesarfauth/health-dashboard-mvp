@@ -1,13 +1,12 @@
 <?php
 
+use App\Http\Controllers\Api\HealthRecordController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |------------------------------------------------------------------------------
 | API Routes
 |------------------------------------------------------------------------------
-| Health-record endpoints are wired in Phase 2. For now a lightweight ping lets
-| us confirm the API stack (nginx -> php-fpm -> Laravel) responds on :9000.
 */
 
 Route::get('/ping', fn () => response()->json([
@@ -15,3 +14,9 @@ Route::get('/ping', fn () => response()->json([
     'status' => 'ok',
     'time' => now()->toIso8601String(),
 ]));
+
+Route::apiResource('health-records', HealthRecordController::class)
+    ->only(['index', 'store', 'show']);
+
+// Differential — temporal trend analysis (implemented in Phase 5)
+// Route::post('health-records/{id}/trend-analysis', [HealthRecordController::class, 'trendAnalysis']);
