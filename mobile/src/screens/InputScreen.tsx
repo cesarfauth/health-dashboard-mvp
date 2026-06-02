@@ -36,23 +36,23 @@ export function InputScreen({ onCreated }: Props) {
 
     const sleepNum = Number(sleep);
     if (sleep.trim() === '' || Number.isNaN(sleepNum)) {
-      next.sleep_hours = 'Enter sleep hours as a number.';
+      next.sleep_hours = 'Informe as horas de sono como número.';
     } else if (sleepNum < 0 || sleepNum > 24) {
-      next.sleep_hours = 'Sleep must be between 0 and 24 hours.';
+      next.sleep_hours = 'O sono deve estar entre 0 e 24 horas.';
     }
 
     const glucoseNum = Number(glucose);
     if (glucose.trim() === '' || !Number.isInteger(glucoseNum)) {
-      next.glucose_level = 'Enter glucose as a whole number (mg/dL).';
+      next.glucose_level = 'Informe a glicose como número inteiro (mg/dL).';
     } else if (glucoseNum < 20 || glucoseNum > 600) {
-      next.glucose_level = 'Glucose must be between 20 and 600 mg/dL.';
+      next.glucose_level = 'A glicose deve estar entre 20 e 600 mg/dL.';
     }
 
     const hrvNum = Number(hrv);
     if (hrv.trim() === '' || !Number.isInteger(hrvNum)) {
-      next.hrv = 'Enter HRV as a whole number (ms).';
+      next.hrv = 'Informe a HRV como número inteiro (ms).';
     } else if (hrvNum < 1 || hrvNum > 300) {
-      next.hrv = 'HRV must be between 1 and 300 ms.';
+      next.hrv = 'A HRV deve estar entre 1 e 300 ms.';
     }
 
     return next;
@@ -87,7 +87,7 @@ export function InputScreen({ onCreated }: Props) {
         });
         setErrors(mapped);
       } else {
-        setFormError(e instanceof Error ? e.message : 'Something went wrong.');
+        setFormError(e instanceof Error ? e.message : 'Algo deu errado.');
       }
     } finally {
       setSubmitting(false);
@@ -100,25 +100,25 @@ export function InputScreen({ onCreated }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>New reading</Text>
+        <Text style={styles.title}>Nova leitura</Text>
         <Text style={styles.subtitle}>
-          Enter today&apos;s biomarkers. We&apos;ll analyze them and suggest habits.
+          Insira os biomarcadores de hoje. Vamos analisá-los e sugerir hábitos.
         </Text>
 
         <FormField
-          label="Sleep"
-          unit="hours"
+          label="Sono"
+          unit="horas"
           value={sleep}
           onChangeText={setSleep}
-          placeholder="e.g. 7.5"
+          placeholder="ex: 7.5"
           error={errors.sleep_hours}
         />
         <FormField
-          label="Glucose (fasting)"
+          label="Glicose (jejum)"
           unit="mg/dL"
           value={glucose}
           onChangeText={setGlucose}
-          placeholder="e.g. 92"
+          placeholder="ex: 92"
           error={errors.glucose_level}
         />
         <FormField
@@ -126,14 +126,14 @@ export function InputScreen({ onCreated }: Props) {
           unit="ms"
           value={hrv}
           onChangeText={setHrv}
-          placeholder="e.g. 60"
+          placeholder="ex: 60"
           error={errors.hrv}
         />
 
         {formError ? <Text style={styles.formError}>{formError}</Text> : null}
 
         <PrimaryButton
-          label="Analyze with AI"
+          label="Analisar com IA"
           onPress={handleSubmit}
           loading={submitting}
         />

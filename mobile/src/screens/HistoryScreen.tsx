@@ -16,7 +16,7 @@ function HistoryRow({ record }: { record: HealthRecord }) {
   return (
     <View style={styles.row}>
       <Text style={styles.rowDate}>
-        {new Date(record.recorded_at).toLocaleString()}
+        {new Date(record.recorded_at).toLocaleString('pt-BR')}
       </Text>
       <View style={styles.metrics}>
         {[sleep_hours, glucose_level, hrv].map((b, i) => (
@@ -57,10 +57,10 @@ export function HistoryScreen() {
       contentContainerStyle={styles.content}
       onRefresh={refresh}
       refreshing={loading}
-      ListHeaderComponent={<Text style={styles.title}>History</Text>}
+      ListHeaderComponent={<Text style={styles.title}>Histórico</Text>}
       ListEmptyComponent={
         <Text style={styles.empty}>
-          {error ?? 'No readings recorded yet.'}
+          {error ?? 'Nenhuma leitura registrada ainda.'}
         </Text>
       }
     />

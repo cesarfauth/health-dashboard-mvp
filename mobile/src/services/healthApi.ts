@@ -72,12 +72,12 @@ function normalizeError(error: unknown): Error {
     }
     if (error.response) {
       return new Error(
-        `Server error (${error.response.status}). Please try again.`,
+        `Erro no servidor (${error.response.status}). Tente novamente.`,
       );
     }
     return new Error(
-      'Could not reach the server. Check that the backend is running and EXPO_PUBLIC_API_URL is correct.',
+      'Não foi possível conectar ao servidor. Verifique se o backend está rodando e se a EXPO_PUBLIC_API_URL está correta.',
     );
   }
-  return error instanceof Error ? error : new Error('Unexpected error.');
+  return error instanceof Error ? error : new Error('Erro inesperado.');
 }

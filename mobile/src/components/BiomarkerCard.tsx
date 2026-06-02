@@ -5,8 +5,8 @@ import { colors } from '../theme/colors';
 import type { Biomarker } from '../types/health';
 
 const ICONS: Record<string, string> = {
-  Sleep: '🌙',
-  'Glucose (fasting)': '🩸',
+  Sono: '🌙',
+  'Glicose (jejum)': '🩸',
   HRV: '❤️',
 };
 

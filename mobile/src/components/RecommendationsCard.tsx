@@ -23,7 +23,7 @@ export function RecommendationsCard({
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.title}>AI Recommendations</Text>
+        <Text style={styles.title}>Recomendações da IA</Text>
         <View
           style={[
             styles.sourceBadge,
@@ -36,7 +36,7 @@ export function RecommendationsCard({
               { color: isFallback ? '#92400E' : '#1E40AF' },
             ]}
           >
-            {isFallback ? 'Offline baseline' : `AI · ${recommendation.model ?? 'model'}`}
+            {isFallback ? 'Base offline' : `IA · ${recommendation.model ?? 'modelo'}`}
           </Text>
         </View>
       </View>

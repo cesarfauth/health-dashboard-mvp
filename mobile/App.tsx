@@ -18,7 +18,7 @@ export default function App() {
       <SafeAreaView style={styles.safe}>
         <StatusBar style="dark" />
         <View style={styles.header}>
-          <Text style={styles.brand}>🩺 Health Dashboard</Text>
+          <Text style={styles.brand}>🩺 Painel de Saúde</Text>
         </View>
 
         <View style={styles.body}>

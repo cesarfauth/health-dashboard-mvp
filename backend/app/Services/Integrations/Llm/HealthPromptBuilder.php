@@ -23,19 +23,25 @@ class HealthPromptBuilder
      * to the model) so its presence is guaranteed regardless of LLM behavior.
      */
     public const DISCLAIMER =
-        'This information is generated for general wellness and educational '.
-        'purposes only. It is not medical advice, diagnosis, or treatment. '.
-        'Always consult a qualified healthcare professional about your health.';
+        'Estas informações são geradas apenas para fins gerais de bem-estar e '.
+        'educação. Não constituem aconselhamento médico, diagnóstico ou '.
+        'tratamento. Consulte sempre um profissional de saúde qualificado sobre '.
+        'a sua saúde.';
 
     private const SYSTEM_RULES =
-        'You are a cautious wellness assistant for a health-tracking app. '.
-        'You NEVER diagnose, NEVER name diseases, and NEVER prescribe medication. '.
-        'You translate daily biomarkers into gentle, practical lifestyle habits. '.
-        'Respond ONLY with a single valid JSON object, no markdown, no prose around it. '.
-        'Schema: {"summary": string (max 2 sentences, supportive tone), '.
-        '"recommendations": [exactly 3 objects with '.
-        '{"title": short string, "detail": one actionable sentence, '.
-        '"category": one of "sleep"|"nutrition"|"activity"|"stress"|"general"}]}.';
+        'Você é um assistente de bem-estar cauteloso de um app de '.
+        'acompanhamento de saúde. Você NUNCA faz diagnóstico, NUNCA cita doenças '.
+        'e NUNCA prescreve medicamentos. Você traduz biomarcadores diários em '.
+        'hábitos de estilo de vida gentis e práticos. '.
+        'Escreva TODOS os textos em português do Brasil. '.
+        'Responda APENAS com um único objeto JSON válido, sem markdown e sem '.
+        'texto ao redor. '.
+        'Esquema: {"summary": string (máx. 2 frases, tom acolhedor, em '.
+        'português), "recommendations": [exatamente 3 objetos com '.
+        '{"title": string curta em português, "detail": uma frase acionável em '.
+        'português, "category": um de "sleep"|"nutrition"|"activity"|"stress"|'.
+        '"general"}]}. Os valores de "category" devem permanecer nesses termos '.
+        'em inglês; todo o restante em português.';
 
     public function forSnapshot(HealthRecord $record): LlmPrompt
     {
@@ -45,9 +51,9 @@ class HealthPromptBuilder
             'hrv' => $record->hrv,
         ]);
 
-        $user = "Here is a single set of biomarker readings for today:\n".
+        $user = "Aqui está um conjunto de leituras de biomarcadores de hoje:\n".
             implode("\n", $lines)."\n\n".
-            'Give a brief supportive summary and exactly 3 daily-habit recommendations.';
+            'Dê um breve resumo acolhedor e exatamente 3 recomendações de hábitos diários.';
 
         return new LlmPrompt(self::SYSTEM_RULES, $user, 'snapshot');
     }
@@ -61,11 +67,11 @@ class HealthPromptBuilder
      */
     public function forTrend(Collection $history, array $features): LlmPrompt
     {
-        $user = "Here are pre-computed trends from the user's recent records ".
-            "(already calculated, do not recompute):\n".
+        $user = 'Aqui estão tendências pré-calculadas dos registros recentes do '.
+            "usuário (já calculadas, não recalcule):\n".
             json_encode($features, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n\n".
-            'Interpret these trends and give exactly 3 daily-habit recommendations '.
-            'that address the most relevant pattern.';
+            'Interprete essas tendências e dê exatamente 3 recomendações de '.
+            'hábitos diários que abordem o padrão mais relevante.';
 
         return new LlmPrompt(self::SYSTEM_RULES, $user, 'trend');
     }
@@ -83,7 +89,7 @@ class HealthPromptBuilder
             $status = BiomarkerClassifier::classify($metric, $value)->value;
 
             $lines[] = sprintf(
-                '- %s: %s %s (status: %s; healthy range %s-%s %s)',
+                '- %s: %s %s (situação: %s; faixa saudável %s-%s %s)',
                 $config['label'],
                 $value,
                 $config['unit'],

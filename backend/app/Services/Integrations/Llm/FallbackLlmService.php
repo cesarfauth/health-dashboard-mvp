@@ -19,25 +19,25 @@ class FallbackLlmService implements LlmClientInterface
     public function analyze(LlmPrompt $prompt): AiAnalysisResult
     {
         $summary = $prompt->type === 'trend'
-            ? 'Baseline trend view generated offline. Configure an LLM API key for AI-tailored insights.'
-            : 'Here is a general wellness baseline for your readings. Configure an LLM API key for AI-tailored insights.';
+            ? 'Visão de tendência básica gerada offline. Configure uma chave de API de LLM para insights personalizados por IA.'
+            : 'Aqui está uma base geral de bem-estar para suas leituras. Configure uma chave de API de LLM para insights personalizados por IA.';
 
         return new AiAnalysisResult(
             summary: $summary,
             recommendations: [
                 new RecommendationDTO(
-                    title: 'Keep a steady sleep schedule',
-                    detail: 'Aim for 7-9 hours and try to sleep and wake at consistent times.',
+                    title: 'Mantenha um horário de sono regular',
+                    detail: 'Busque de 7 a 9 horas e tente dormir e acordar em horários consistentes.',
                     category: 'sleep',
                 ),
                 new RecommendationDTO(
-                    title: 'Balance meals and hydration',
-                    detail: 'Pair carbs with protein and fiber, and drink water throughout the day.',
+                    title: 'Equilibre refeições e hidratação',
+                    detail: 'Combine carboidratos com proteína e fibras e beba água ao longo do dia.',
                     category: 'nutrition',
                 ),
                 new RecommendationDTO(
-                    title: 'Add light daily movement',
-                    detail: 'A 20-30 minute walk supports recovery and steady energy.',
+                    title: 'Inclua movimento leve diário',
+                    detail: 'Uma caminhada de 20 a 30 minutos ajuda na recuperação e na energia estável.',
                     category: 'activity',
                 ),
             ],

@@ -27,7 +27,7 @@ class TrendAnalysisResource extends JsonResource
                 'records_analyzed' => $result->recordsAnalyzed,
                 'required' => $result->required,
                 'message' => sprintf(
-                    'Add at least %d readings for a reliable trend — you have %d so far.',
+                    'Adicione pelo menos %d leituras para uma tendência confiável — você tem %d até agora.',
                     $result->required,
                     $result->recordsAnalyzed,
                 ),

@@ -27,7 +27,7 @@ export function TrendMetricCard({ metric }: { metric: TrendMetric }) {
         </Text>
       </View>
       <Text style={styles.avg}>
-        avg {metric.average} {metric.unit} · range {metric.min}–{metric.max}
+        média {metric.average} {metric.unit} · faixa {metric.min}–{metric.max}
       </Text>
     </View>
   );

@@ -31,7 +31,7 @@ export function DashboardScreen({ onAddPress }: Props) {
   if (error && !latest) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorTitle}>Couldn&apos;t load your data</Text>
+        <Text style={styles.errorTitle}>Não foi possível carregar seus dados</Text>
         <Text style={styles.errorText}>{error}</Text>
       </View>
     );
@@ -41,12 +41,12 @@ export function DashboardScreen({ onAddPress }: Props) {
     return (
       <View style={styles.centered}>
         <Text style={styles.emptyIcon}>📈</Text>
-        <Text style={styles.errorTitle}>No readings yet</Text>
+        <Text style={styles.errorTitle}>Nenhuma leitura ainda</Text>
         <Text style={styles.errorText}>
-          Add your first biomarker reading to see your dashboard.
+          Adicione sua primeira leitura de biomarcadores para ver o painel.
         </Text>
         <Text style={styles.link} onPress={onAddPress}>
-          + New reading
+          + Nova leitura
         </Text>
       </View>
     );
@@ -59,9 +59,9 @@ export function DashboardScreen({ onAddPress }: Props) {
         <RefreshControl refreshing={loading} onRefresh={refresh} />
       }
     >
-      <Text style={styles.title}>Today&apos;s snapshot</Text>
+      <Text style={styles.title}>Resumo de hoje</Text>
       <Text style={styles.date}>
-        {new Date(latest.recorded_at).toLocaleString()}
+        {new Date(latest.recorded_at).toLocaleString('pt-BR')}
       </Text>
 
       <View style={styles.cardsRow}>
@@ -73,7 +73,7 @@ export function DashboardScreen({ onAddPress }: Props) {
       {latest.recommendation ? (
         <RecommendationsCard recommendation={latest.recommendation} />
       ) : (
-        <Text style={styles.errorText}>No recommendation attached.</Text>
+        <Text style={styles.errorText}>Nenhuma recomendação anexada.</Text>
       )}
     </ScrollView>
   );

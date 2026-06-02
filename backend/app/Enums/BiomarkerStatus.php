@@ -29,9 +29,9 @@ enum BiomarkerStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::NORMAL => 'Within range',
-            self::ATTENTION => 'Needs attention',
-            self::ALERT => 'Out of range',
+            self::NORMAL => 'Dentro da faixa',
+            self::ATTENTION => 'Requer atenção',
+            self::ALERT => 'Fora da faixa',
         };
     }
 }

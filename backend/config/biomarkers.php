@@ -19,7 +19,7 @@
 return [
 
     'sleep_hours' => [
-        'label' => 'Sleep',
+        'label' => 'Sono',
         'unit' => 'h',
         'normal_min' => 7.0,
         'normal_max' => 9.0,
@@ -28,7 +28,7 @@ return [
     ],
 
     'glucose_level' => [
-        'label' => 'Glucose (fasting)',
+        'label' => 'Glicose (jejum)',
         'unit' => 'mg/dL',
         'normal_min' => 70,
         'normal_max' => 99,

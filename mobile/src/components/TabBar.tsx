@@ -6,10 +6,10 @@ import { colors } from '../theme/colors';
 export type TabKey = 'dashboard' | 'input' | 'trends' | 'history';
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: '📊' },
-  { key: 'input', label: 'New', icon: '➕' },
-  { key: 'trends', label: 'Trends', icon: '📈' },
-  { key: 'history', label: 'History', icon: '🕑' },
+  { key: 'dashboard', label: 'Painel', icon: '📊' },
+  { key: 'input', label: 'Nova', icon: '➕' },
+  { key: 'trends', label: 'Tendências', icon: '📈' },
+  { key: 'history', label: 'Histórico', icon: '🕑' },
 ];
 
 interface Props {

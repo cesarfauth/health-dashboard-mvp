@@ -25,7 +25,7 @@ export function TrendScreen() {
     try {
       setResult(await requestTrendAnalysis(latest.id));
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Analysis failed.');
+      setError(e instanceof Error ? e.message : 'Falha na análise.');
     } finally {
       setLoading(false);
     }
@@ -33,21 +33,21 @@ export function TrendScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Trend analysis</Text>
+      <Text style={styles.title}>Análise de tendência</Text>
       <Text style={styles.subtitle}>
-        We compute the exact deltas across your recent readings, then let the AI
-        interpret the pattern. Needs at least 3 readings.
+        Calculamos as variações exatas entre suas leituras recentes e deixamos a
+        IA interpretar o padrão. Precisa de pelo menos 3 leituras.
       </Text>
 
       <PrimaryButton
-        label={`Analyze ${records.length} reading${records.length === 1 ? '' : 's'}`}
+        label={`Analisar ${records.length} leitura${records.length === 1 ? '' : 's'}`}
         onPress={runAnalysis}
         loading={loading}
         disabled={!latest}
       />
 
       {!latest ? (
-        <Text style={styles.hint}>Add a reading first to enable analysis.</Text>
+        <Text style={styles.hint}>Adicione uma leitura primeiro para habilitar a análise.</Text>
       ) : null}
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -62,7 +62,7 @@ export function TrendScreen() {
       {result?.status === 'ok' ? (
         <View style={styles.results}>
           <Text style={styles.sectionLabel}>
-            Computed over {result.records_analyzed} readings
+            Calculado sobre {result.records_analyzed} leituras
           </Text>
           <TrendMetricCard metric={result.metrics.sleep_hours} />
           <TrendMetricCard metric={result.metrics.glucose_level} />

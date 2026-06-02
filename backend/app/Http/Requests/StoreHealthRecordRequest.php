@@ -32,16 +32,16 @@ class StoreHealthRecordRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'sleep_hours.required' => 'Sleep hours are required.',
-            'sleep_hours.numeric' => 'Sleep hours must be a number.',
-            'sleep_hours.max' => 'Sleep hours cannot exceed 24.',
-            'glucose_level.required' => 'Glucose level is required.',
-            'glucose_level.integer' => 'Glucose level must be a whole number (mg/dL).',
-            'glucose_level.min' => 'Glucose level looks too low to be valid.',
-            'glucose_level.max' => 'Glucose level looks too high to be valid.',
-            'hrv.required' => 'HRV is required.',
-            'hrv.integer' => 'HRV must be a whole number (ms).',
-            'hrv.max' => 'HRV looks too high to be valid.',
+            'sleep_hours.required' => 'As horas de sono são obrigatórias.',
+            'sleep_hours.numeric' => 'As horas de sono devem ser um número.',
+            'sleep_hours.max' => 'As horas de sono não podem passar de 24.',
+            'glucose_level.required' => 'O nível de glicose é obrigatório.',
+            'glucose_level.integer' => 'A glicose deve ser um número inteiro (mg/dL).',
+            'glucose_level.min' => 'O nível de glicose parece baixo demais para ser válido.',
+            'glucose_level.max' => 'O nível de glicose parece alto demais para ser válido.',
+            'hrv.required' => 'A HRV é obrigatória.',
+            'hrv.integer' => 'A HRV deve ser um número inteiro (ms).',
+            'hrv.max' => 'A HRV parece alta demais para ser válida.',
         ];
     }
 }
