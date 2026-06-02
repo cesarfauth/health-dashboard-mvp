@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use App\Repositories\Contracts\HealthRecordRepositoryInterface;
 use App\Repositories\Eloquent\HealthRecordRepository;
+use App\Services\Integrations\Claude\ClaudeClientInterface;
+use App\Services\Integrations\Claude\ClaudeService;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -22,5 +24,9 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public array $bindings = [
         HealthRecordRepositoryInterface::class => HealthRecordRepository::class,
+
+        // The live SDK implementation; it self-degrades to FallbackClaudeService
+        // when no API key is set or a call fails.
+        ClaudeClientInterface::class => ClaudeService::class,
     ];
 }
