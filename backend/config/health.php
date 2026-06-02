@@ -28,4 +28,12 @@ return [
     */
     'trend_min_records' => 3,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Trend window
+    |--------------------------------------------------------------------------
+    | How many of the most recent records feed the temporal trend analysis.
+    */
+    'trend_window' => 7,
+
 ];

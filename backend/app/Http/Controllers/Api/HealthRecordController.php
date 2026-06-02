@@ -8,7 +8,9 @@ use App\DTOs\BiomarkerInputDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreHealthRecordRequest;
 use App\Http\Resources\HealthRecordResource;
+use App\Http\Resources\TrendAnalysisResource;
 use App\Services\HealthRecordService;
+use App\Services\TrendAnalysisService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +23,7 @@ class HealthRecordController extends Controller
 {
     public function __construct(
         private readonly HealthRecordService $service,
+        private readonly TrendAnalysisService $trends,
     ) {}
 
     /**
@@ -62,6 +65,24 @@ class HealthRecordController extends Controller
         return (new HealthRecordResource($record))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
+    }
+
+    /**
+     * POST /api/health-records/{id}/trend-analysis — temporal trend (differential).
+     */
+    public function trendAnalysis(int $id): JsonResponse
+    {
+        $record = $this->service->find($id, $this->userId());
+
+        abort_if($record === null, Response::HTTP_NOT_FOUND, 'Health record not found.');
+
+        $result = $this->trends->analyzeForRecord($record, $this->userId());
+
+        return (new TrendAnalysisResource($result))
+            ->response()
+            ->setStatusCode(
+                $result->sufficient ? Response::HTTP_CREATED : Response::HTTP_OK,
+            );
     }
 
     private function userId(): int

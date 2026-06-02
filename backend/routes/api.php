@@ -18,5 +18,5 @@ Route::get('/ping', fn () => response()->json([
 Route::apiResource('health-records', HealthRecordController::class)
     ->only(['index', 'store', 'show']);
 
-// Differential — temporal trend analysis (implemented in Phase 5)
-// Route::post('health-records/{id}/trend-analysis', [HealthRecordController::class, 'trendAnalysis']);
+// Differential — temporal trend analysis.
+Route::post('health-records/{id}/trend-analysis', [HealthRecordController::class, 'trendAnalysis']);
