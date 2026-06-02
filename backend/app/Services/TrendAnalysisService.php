@@ -7,8 +7,8 @@ namespace App\Services;
 use App\DTOs\TrendAnalysisResult;
 use App\Models\HealthRecord;
 use App\Repositories\Contracts\HealthRecordRepositoryInterface;
-use App\Services\Integrations\Claude\ClaudeClientInterface;
-use App\Services\Integrations\Claude\HealthPromptBuilder;
+use App\Services\Integrations\Llm\HealthPromptBuilder;
+use App\Services\Integrations\Llm\LlmClientInterface;
 use App\Support\TrendFeatureBuilder;
 
 /**
@@ -22,7 +22,7 @@ class TrendAnalysisService
 {
     public function __construct(
         private readonly HealthRecordRepositoryInterface $repository,
-        private readonly ClaudeClientInterface $claude,
+        private readonly LlmClientInterface $llm,
         private readonly HealthPromptBuilder $prompts,
         private readonly TrendFeatureBuilder $features,
     ) {}
@@ -42,7 +42,7 @@ class TrendAnalysisService
         $features = $this->features->build($records);
 
         $prompt = $this->prompts->forTrend($records, $features);
-        $analysis = $this->claude->analyze($prompt);
+        $analysis = $this->llm->analyze($prompt);
 
         $recommendation = $this->repository->attachRecommendation(
             $record,

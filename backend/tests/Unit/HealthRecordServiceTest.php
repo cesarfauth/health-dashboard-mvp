@@ -11,9 +11,9 @@ use App\Models\AiRecommendation;
 use App\Models\HealthRecord;
 use App\Repositories\Contracts\HealthRecordRepositoryInterface;
 use App\Services\HealthRecordService;
-use App\Services\Integrations\Claude\ClaudeClientInterface;
-use App\Services\Integrations\Claude\ClaudePrompt;
-use App\Services\Integrations\Claude\HealthPromptBuilder;
+use App\Services\Integrations\Llm\HealthPromptBuilder;
+use App\Services\Integrations\Llm\LlmClientInterface;
+use App\Services\Integrations\Llm\LlmPrompt;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
@@ -66,7 +66,7 @@ class HealthRecordServiceTest extends TestCase
             ->andReturn($persisted);
 
         // Prompt builder: returns a deterministic prompt for the record.
-        $prompt = new ClaudePrompt('system', 'user', 'snapshot');
+        $prompt = new LlmPrompt('system', 'user', 'snapshot');
         $prompts = Mockery::mock(HealthPromptBuilder::class);
         $prompts->shouldReceive('forSnapshot')
             ->once()
@@ -74,7 +74,7 @@ class HealthRecordServiceTest extends TestCase
             ->andReturn($prompt);
 
         // Claude client: receives that prompt, returns the analysis.
-        $claude = Mockery::mock(ClaudeClientInterface::class);
+        $claude = Mockery::mock(LlmClientInterface::class);
         $claude->shouldReceive('analyze')
             ->once()
             ->with($prompt)
@@ -99,7 +99,7 @@ class HealthRecordServiceTest extends TestCase
 
         $service = new HealthRecordService(
             $repository,
-            Mockery::mock(ClaudeClientInterface::class),
+            Mockery::mock(LlmClientInterface::class),
             Mockery::mock(HealthPromptBuilder::class),
         );
 

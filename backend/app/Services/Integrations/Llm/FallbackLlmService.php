@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Integrations\Claude;
+namespace App\Services\Integrations\Llm;
 
 use App\DTOs\AiAnalysisResult;
 use App\DTOs\RecommendationDTO;
 
 /**
- * Deterministic, offline implementation of the Claude client.
+ * Deterministic, offline implementation of the LLM client.
  *
- * Used when no ANTHROPIC_API_KEY is configured, or as a safety net when the
- * live API call fails. It keeps the whole product demonstrable end-to-end with
- * zero credentials, and every response is transparently flagged source=fallback.
+ * Used as a safety net when the configured provider has no API key or its call
+ * fails, so the whole product stays demonstrable end-to-end with zero
+ * credentials. Every response is transparently flagged source=fallback.
  */
-class FallbackClaudeService implements ClaudeClientInterface
+class FallbackLlmService implements LlmClientInterface
 {
-    public function analyze(ClaudePrompt $prompt): AiAnalysisResult
+    public function analyze(LlmPrompt $prompt): AiAnalysisResult
     {
         $summary = $prompt->type === 'trend'
-            ? 'Baseline trend view generated offline. Connect an API key for AI-tailored insights.'
-            : 'Here is a general wellness baseline for your readings. Connect an API key for AI-tailored insights.';
+            ? 'Baseline trend view generated offline. Configure an LLM API key for AI-tailored insights.'
+            : 'Here is a general wellness baseline for your readings. Configure an LLM API key for AI-tailored insights.';
 
         return new AiAnalysisResult(
             summary: $summary,

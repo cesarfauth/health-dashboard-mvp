@@ -35,6 +35,20 @@ return [
         ],
     ],
 
+    // Which LLM provider answers LlmClientInterface: 'openai' | 'anthropic'.
+    'llm' => [
+        'provider' => env('LLM_PROVIDER', 'openai'),
+    ],
+
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+        'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
+        'base_url' => env('OPENAI_BASE_URL', 'https://api.openai.com/v1'),
+        'max_tokens' => (int) env('OPENAI_MAX_TOKENS', 1024),
+        'timeout' => (int) env('OPENAI_TIMEOUT', 30),
+        'retries' => (int) env('OPENAI_RETRIES', 2),
+    ],
+
     'anthropic' => [
         'api_key' => env('ANTHROPIC_API_KEY'),
         'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-5'),

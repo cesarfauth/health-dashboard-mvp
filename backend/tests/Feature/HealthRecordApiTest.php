@@ -6,8 +6,8 @@ namespace Tests\Feature;
 
 use App\DTOs\AiAnalysisResult;
 use App\DTOs\RecommendationDTO;
-use App\Services\Integrations\Claude\ClaudeClientInterface;
-use App\Services\Integrations\Claude\ClaudePrompt;
+use App\Services\Integrations\Llm\LlmClientInterface;
+use App\Services\Integrations\Llm\LlmPrompt;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,9 +21,9 @@ class HealthRecordApiTest extends TestCase
 
         // Swap the Claude client for a deterministic fake so the HTTP flow is
         // exercised end-to-end without any network call.
-        $this->app->instance(ClaudeClientInterface::class, new class implements ClaudeClientInterface
+        $this->app->instance(LlmClientInterface::class, new class implements LlmClientInterface
         {
-            public function analyze(ClaudePrompt $prompt): AiAnalysisResult
+            public function analyze(LlmPrompt $prompt): AiAnalysisResult
             {
                 return new AiAnalysisResult(
                     summary: 'Fake analysis for tests.',

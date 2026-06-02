@@ -2,16 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Integrations\Claude;
+namespace App\Services\Integrations\Llm;
 
 use App\Models\HealthRecord;
 use App\Support\BiomarkerClassifier;
 use Illuminate\Support\Collection;
 
 /**
- * Builds clinical-friendly (NON-diagnostic) prompts for Claude and owns the
- * mandatory medical disclaimer. Pure string construction — no I/O — so it is
- * fully unit-testable and keeps prompt engineering in one reviewable place.
+ * Builds clinical-friendly (NON-diagnostic) prompts and owns the mandatory
+ * medical disclaimer. Pure string construction — no I/O — so it is fully
+ * unit-testable and keeps prompt engineering in one reviewable place.
+ *
+ * The system prompt deliberately mentions JSON because OpenAI's
+ * response_format=json_object requires the word "json" in the conversation.
  */
 class HealthPromptBuilder
 {
@@ -34,7 +37,7 @@ class HealthPromptBuilder
         '{"title": short string, "detail": one actionable sentence, '.
         '"category": one of "sleep"|"nutrition"|"activity"|"stress"|"general"}]}.';
 
-    public function forSnapshot(HealthRecord $record): ClaudePrompt
+    public function forSnapshot(HealthRecord $record): LlmPrompt
     {
         $lines = $this->describeBiomarkers([
             'sleep_hours' => $record->sleep_hours,
@@ -46,18 +49,17 @@ class HealthPromptBuilder
             implode("\n", $lines)."\n\n".
             'Give a brief supportive summary and exactly 3 daily-habit recommendations.';
 
-        return new ClaudePrompt(self::SYSTEM_RULES, $user, 'snapshot');
+        return new LlmPrompt(self::SYSTEM_RULES, $user, 'snapshot');
     }
 
     /**
      * Trend prompt: receives pre-computed temporal features (deltas, averages,
-     * direction) so the model INTERPRETS rather than calculates. Built in the
-     * trend-analysis feature (Phase 5).
+     * direction) so the model INTERPRETS rather than calculates.
      *
      * @param  Collection<int, HealthRecord>  $history  newest first
      * @param  array<string, mixed>  $features  deterministic stats computed in PHP
      */
-    public function forTrend(Collection $history, array $features): ClaudePrompt
+    public function forTrend(Collection $history, array $features): LlmPrompt
     {
         $user = "Here are pre-computed trends from the user's recent records ".
             "(already calculated, do not recompute):\n".
@@ -65,7 +67,7 @@ class HealthPromptBuilder
             'Interpret these trends and give exactly 3 daily-habit recommendations '.
             'that address the most relevant pattern.';
 
-        return new ClaudePrompt(self::SYSTEM_RULES, $user, 'trend');
+        return new LlmPrompt(self::SYSTEM_RULES, $user, 'trend');
     }
 
     /**

@@ -7,8 +7,8 @@ namespace App\Services;
 use App\DTOs\BiomarkerInputDTO;
 use App\Models\HealthRecord;
 use App\Repositories\Contracts\HealthRecordRepositoryInterface;
-use App\Services\Integrations\Claude\ClaudeClientInterface;
-use App\Services\Integrations\Claude\HealthPromptBuilder;
+use App\Services\Integrations\Llm\HealthPromptBuilder;
+use App\Services\Integrations\Llm\LlmClientInterface;
 use Illuminate\Support\Collection;
 
 /**
@@ -21,7 +21,7 @@ class HealthRecordService
 {
     public function __construct(
         private readonly HealthRecordRepositoryInterface $repository,
-        private readonly ClaudeClientInterface $claude,
+        private readonly LlmClientInterface $llm,
         private readonly HealthPromptBuilder $prompts,
     ) {}
 
@@ -33,7 +33,7 @@ class HealthRecordService
         $record = $this->repository->create($input->toAttributes());
 
         $prompt = $this->prompts->forSnapshot($record);
-        $result = $this->claude->analyze($prompt);
+        $result = $this->llm->analyze($prompt);
 
         $recommendation = $this->repository->attachRecommendation($record, $result->toPersistenceArray());
 

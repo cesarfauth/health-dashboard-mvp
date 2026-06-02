@@ -2,67 +2,45 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Integrations\Claude;
+namespace App\Services\Integrations\Llm;
 
 use Anthropic\Client;
 use Anthropic\Messages\TextBlock;
 use Anthropic\RequestOptions;
 use App\DTOs\AiAnalysisResult;
 use App\DTOs\RecommendationDTO;
-use Illuminate\Support\Facades\Log;
-use Throwable;
+use RuntimeException;
 
 /**
- * Live Claude integration using the official anthropic-ai/sdk, isolated behind
- * ClaudeClientInterface.
- *
- * Resilience: if no API key is configured, or the live call/parse fails, it
- * gracefully degrades to the deterministic FallbackClaudeService and logs the
- * reason — the caller always gets a well-formed AiAnalysisResult.
+ * Live Anthropic Claude integration via the official anthropic-ai/sdk, isolated
+ * behind LlmClientInterface. Kept alongside OpenAiService to demonstrate that
+ * swapping the LLM provider is a one-line config change (LLM_PROVIDER). Throws
+ * on any failure so the ResilientLlmClient can decide whether to fall back.
  */
-class ClaudeService implements ClaudeClientInterface
+class AnthropicService implements LlmClientInterface
 {
-    public function __construct(
-        private readonly FallbackClaudeService $fallback,
-    ) {}
-
-    public function analyze(ClaudePrompt $prompt): AiAnalysisResult
+    public function analyze(LlmPrompt $prompt): AiAnalysisResult
     {
-        $apiKey = (string) config('services.anthropic.api_key');
+        $config = config('services.anthropic');
+        $apiKey = (string) ($config['api_key'] ?? '');
 
         if ($apiKey === '') {
-            Log::info('Claude: no API key configured, using deterministic fallback.');
-
-            return $this->fallback->analyze($prompt);
+            throw new MissingApiKeyException('ANTHROPIC_API_KEY is not configured.');
         }
 
-        try {
-            return $this->callClaude($apiKey, $prompt);
-        } catch (Throwable $e) {
-            Log::warning('Claude: live call failed, falling back.', [
-                'type' => $prompt->type,
-                'error' => $e->getMessage(),
-            ]);
-
-            return $this->fallback->analyze($prompt);
-        }
-    }
-
-    private function callClaude(string $apiKey, ClaudePrompt $prompt): AiAnalysisResult
-    {
-        $model = (string) config('services.anthropic.model');
+        $model = (string) $config['model'];
 
         $client = new Client(
             apiKey: $apiKey,
-            baseUrl: (string) config('services.anthropic.base_url'),
+            baseUrl: (string) $config['base_url'],
             requestOptions: RequestOptions::with(
-                timeout: (float) config('services.anthropic.timeout'),
-                maxRetries: (int) config('services.anthropic.retries'),
+                timeout: (float) $config['timeout'],
+                maxRetries: (int) $config['retries'],
             ),
         );
 
         $message = $client->messages->create(
-            maxTokens: (int) config('services.anthropic.max_tokens'),
+            maxTokens: (int) $config['max_tokens'],
             messages: [['role' => 'user', 'content' => $prompt->user]],
             model: $model,
             system: $prompt->system,
@@ -75,15 +53,13 @@ class ClaudeService implements ClaudeClientInterface
             summary: trim((string) ($payload['summary'] ?? '')),
             recommendations: $this->parseRecommendations($payload['recommendations'] ?? []),
             disclaimer: HealthPromptBuilder::DISCLAIMER,
-            source: 'claude',
+            source: 'anthropic',
             model: $model,
             type: $prompt->type,
         );
     }
 
     /**
-     * Concatenates all text blocks from the response content.
-     *
      * @param  array<int, object>  $content
      */
     private function extractText(array $content): string
@@ -100,19 +76,15 @@ class ClaudeService implements ClaudeClientInterface
     }
 
     /**
-     * Tolerates models that wrap JSON in markdown fences.
-     *
      * @return array<string, mixed>
      */
     private function decodeJson(string $raw): array
     {
-        $clean = trim($raw);
-        $clean = preg_replace('/^```(?:json)?|```$/m', '', $clean) ?? $clean;
-
+        $clean = preg_replace('/^```(?:json)?|```$/m', '', trim($raw)) ?? $raw;
         $decoded = json_decode(trim($clean), true);
 
         if (! is_array($decoded) || ! isset($decoded['summary'], $decoded['recommendations'])) {
-            throw new \RuntimeException('Claude returned an unparseable or incomplete payload.');
+            throw new RuntimeException('Anthropic returned an unparseable or incomplete payload.');
         }
 
         return $decoded;
@@ -133,7 +105,7 @@ class ClaudeService implements ClaudeClientInterface
         }
 
         if (count($recommendations) === 0) {
-            throw new \RuntimeException('Claude returned no usable recommendations.');
+            throw new RuntimeException('Anthropic returned no usable recommendations.');
         }
 
         return $recommendations;
