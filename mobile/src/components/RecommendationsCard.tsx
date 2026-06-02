@@ -36,7 +36,7 @@ export function RecommendationsCard({
               { color: isFallback ? '#92400E' : '#1E40AF' },
             ]}
           >
-            {isFallback ? 'Offline baseline' : `Claude · ${recommendation.model ?? 'AI'}`}
+            {isFallback ? 'Offline baseline' : `AI · ${recommendation.model ?? 'model'}`}
           </Text>
         </View>
       </View>
