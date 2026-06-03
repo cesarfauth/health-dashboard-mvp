@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { TabBar, type TabKey } from './src/components/TabBar';
 import { HealthDataProvider } from './src/context/HealthDataContext';
@@ -14,27 +15,30 @@ export default function App() {
   const [tab, setTab] = useState<TabKey>('dashboard');
 
   return (
-    <HealthDataProvider>
-      <SafeAreaView style={styles.safe}>
-        <StatusBar style="dark" />
-        <View style={styles.header}>
-          <Text style={styles.brand}>🩺 Painel de Saúde</Text>
-        </View>
+    <SafeAreaProvider>
+      <HealthDataProvider>
+        {/* SafeAreaView da safe-area-context respeita status bar no Android */}
+        <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+          <StatusBar style="dark" />
+          <View style={styles.header}>
+            <Text style={styles.brand}>🩺 Painel de Saúde</Text>
+          </View>
 
-        <View style={styles.body}>
-          {tab === 'dashboard' && (
-            <DashboardScreen onAddPress={() => setTab('input')} />
-          )}
-          {tab === 'input' && (
-            <InputScreen onCreated={() => setTab('dashboard')} />
-          )}
-          {tab === 'trends' && <TrendScreen />}
-          {tab === 'history' && <HistoryScreen />}
-        </View>
+          <View style={styles.body}>
+            {tab === 'dashboard' && (
+              <DashboardScreen onAddPress={() => setTab('input')} />
+            )}
+            {tab === 'input' && (
+              <InputScreen onCreated={() => setTab('dashboard')} />
+            )}
+            {tab === 'trends' && <TrendScreen />}
+            {tab === 'history' && <HistoryScreen />}
+          </View>
 
-        <TabBar active={tab} onChange={setTab} />
-      </SafeAreaView>
-    </HealthDataProvider>
+          <TabBar active={tab} onChange={setTab} />
+        </SafeAreaView>
+      </HealthDataProvider>
+    </SafeAreaProvider>
   );
 }
 
