@@ -432,7 +432,7 @@ O que eu implementaria com mais tempo:
 
 ## Repositório
 
-> 📦 **[Link do GitHub — adicionar após push]**
+> 📦 **[https://github.com/cesarfauth/health-dashboard-mvp](https://github.com/cesarfauth/health-dashboard-mvp)**
 
 ---
 
