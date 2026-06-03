@@ -18,27 +18,10 @@ export function RecommendationsCard({
 }: {
   recommendation: AiRecommendation;
 }) {
-  const isFallback = recommendation.source === 'fallback';
-
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <Text style={styles.title}>Recomendações da IA</Text>
-        <View
-          style={[
-            styles.sourceBadge,
-            { backgroundColor: isFallback ? '#FEF3C7' : '#DBEAFE' },
-          ]}
-        >
-          <Text
-            style={[
-              styles.sourceText,
-              { color: isFallback ? '#92400E' : '#1E40AF' },
-            ]}
-          >
-            {isFallback ? 'Base offline' : `IA · ${recommendation.model ?? 'modelo'}`}
-          </Text>
-        </View>
       </View>
 
       <Text style={styles.summary}>{recommendation.summary}</Text>
@@ -75,11 +58,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
   title: { fontSize: 17, fontWeight: '800', color: colors.text },
-  sourceBadge: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
-  sourceText: { fontSize: 11, fontWeight: '700' },
   summary: { fontSize: 14, color: colors.text, lineHeight: 20 },
   item: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   itemIcon: { fontSize: 18, width: 24, textAlign: 'center' },
