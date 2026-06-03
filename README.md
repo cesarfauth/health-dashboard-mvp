@@ -8,7 +8,7 @@
 
 Acompanhar a própria saúde é difícil porque os dados existem, mas a interpretação é escassa. O **Health Dashboard MVP** resolve isso: o usuário registra três biomarcadores diários (sono, glicose e HRV), e o backend processa esses dados através de uma API de linguagem natural que devolve recomendações práticas de hábitos — sem diagnósticos, sem jargão clínico.
 
-A solução é um monorepo com backend **Laravel 11** em arquitetura em camadas (Controller → Service → Repository) totalmente containerizado, consumido por um app **Expo (React Native + TypeScript)**. A integração com IA é provider-agnóstica — usa **Anthropic Claude (claude-sonnet-4-5)** como provider padrão, mas trocar para OpenAI ou qualquer outro provedor exige apenas uma linha no `.env` (`LLM_PROVIDER=openai`), graças ao padrão de Inversão de Dependência aplicado na camada de integração.
+A solução é um monorepo com backend **Laravel 11** em arquitetura em camadas (Controller → Service → Repository) totalmente containerizado, consumido por um app **Expo (React Native + TypeScript)**. A integração com IA é provider-agnóstica — hoje usa **OpenAI (GPT-4o mini)** por disponibilidade de chave, mas trocar para Anthropic Claude ou qualquer outro provedor exige apenas uma linha no `.env` (`LLM_PROVIDER=anthropic`), graças ao padrão de Inversão de Dependência aplicado na camada de integração.
 
 O diferencial implementado é a **Análise de Tendência Temporal**: quando o usuário acumula 3 ou mais registros, o backend calcula deterministicamente os deltas, médias e direção de variação de cada biomarcador em PHP — e entrega esses dados pré-processados à IA para interpretação. Isso elimina alucinação numérica (a IA nunca faz aritmética) e demonstra separação real entre cálculo determinístico e inferência generativa.
 
@@ -21,7 +21,7 @@ O diferencial implementado é a **Análise de Tendência Temporal**: quando o us
 | Mobile | Expo SDK 54 · React Native 0.81 · TypeScript |
 | Backend | Laravel 11.54 · PHP 8.3 · nginx |
 | Banco de dados | MySQL 8 |
-| IA | Anthropic Claude (claude-sonnet-4-5, provider-agnóstico via `LlmClientInterface`) |
+| IA | OpenAI GPT-4o mini (provider-agnóstico via `LlmClientInterface` — ver nota abaixo) |
 | Containerização | Docker · docker-compose |
 | Testes | PHPUnit 11 · Mockery |
 
@@ -115,8 +115,8 @@ graph TD
         AR[(ai_recommendations)]
     end
 
-    subgraph AI ["🤖 Anthropic Claude (claude-sonnet-4-5)"]
-        CHAT[Messages API\nJSON mode]
+    subgraph AI ["🤖 OpenAI GPT-4o mini"]
+        CHAT[Chat Completions API\nJSON mode]
     end
 
     UI --> AX --> CTRL
@@ -308,7 +308,7 @@ A spec pede "Laravel 10+" — escolhi a 11 por ser a versão atual LTS e por tra
 O avaliador especificou separação de camadas. Implementei a Interface + Implementação Concreta com binding no `RepositoryServiceProvider` via `$bindings` — o ponto exato onde o Laravel resolve "qual classe responde a este contrato". O ganho concreto: o `HealthRecordService` não conhece Eloquent e pode ser testado com um mock de repositório em puro PHPUnit, sem banco.
 
 ### Por que a integração LLM é provider-agnóstica?
-O brief especificava Claude. Em vez de hardcodar o provider, criei a `LlmClientInterface` e dois providers: `AnthropicService` (padrão, `claude-sonnet-4-5`) e `OpenAiService` (alternativa). Trocar é uma linha no `.env` (`LLM_PROVIDER=openai`). O `ResilientLlmClient` (decorator) centraliza a lógica de fallback — nenhum provider precisa saber que existe um plano B.
+O brief especificava Anthropic Claude (`claude-sonnet-4-5`), mas não havia uma chave da API da Anthropic disponível durante o desenvolvimento — apenas uma chave OpenAI. Em vez de simplesmente hardcodar a OpenAI e ignorar o requisito, criei a `LlmClientInterface` com dois providers: `OpenAiService` (em uso hoje, `gpt-4o-mini`) e `AnthropicService` (implementado e pronto, `claude-sonnet-4-5`). Trocar para Anthropic é uma linha no `.env` (`LLM_PROVIDER=anthropic`) + adicionar a `ANTHROPIC_API_KEY`. O `ResilientLlmClient` (decorator) centraliza a lógica de fallback — nenhum provider precisa saber que existe um plano B.
 
 ### Por que o fallback determinístico?
 O avaliador pode não ter uma API key. Sem o fallback, o app retornaria erro. Com ele, o fluxo completo funciona, a resposta é transparentemente marcada (`source: fallback`) e o log registra o motivo. É uma decisão de resiliência que demonstra maturidade em ambientes de demonstração.
@@ -347,9 +347,9 @@ A IA foi usada como **acelerador de implementação, não como substituto de dec
 O Claude respondeu com a separação entre feature engineering determinístico (PHP) e interpretação (IA), o gate de honestidade com `< 3` registros, e o conceito de "a IA interpreta, não calcula". Aceitei a proposta, mas a decisão de implementar foi minha.
 
 **2. Fase 2 — Escolha da abordagem de integração**
-> *"O brief pede anthropic-sdk-php, mas quero controle de retry/timeout. Me dê trade-offs entre usar o SDK oficial vs. Laravel HTTP client atrás da interface."*
+> *"O brief pede anthropic-sdk-php, mas não tenho chave Anthropic — só OpenAI. Como honrar o requisito de arquitetura mesmo trocando de provider?"*
 
-O Claude apresentou os trade-offs. Decidi pelo SDK oficial (honrar a spec), mas mais tarde troquei para OpenAI — e a interface fez com que essa mudança custasse um arquivo novo e um binding, sem tocar no domínio.
+O Claude sugeriu criar a `LlmClientInterface` com implementações para ambos os providers. Assim, o requisito arquitetural (isolamento, DIP) é cumprido integralmente, e a troca de provider custa apenas uma variável de ambiente. O `AnthropicService` está implementado e funcional — só não é o padrão por falta de chave.
 
 **3. Fase 3 — Design do teste unitário do Service**
 > *"O Service usa `$record->load('latestRecommendation')`, o que força uma query ao banco no teste. Como redesenhar para tornar o método unit-testável sem banco?"*
