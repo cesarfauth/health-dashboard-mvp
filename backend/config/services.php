@@ -35,9 +35,9 @@ return [
         ],
     ],
 
-    // Which LLM provider answers LlmClientInterface: 'openai' | 'anthropic'.
+    // Which LLM provider answers LlmClientInterface: 'anthropic' (default) | 'openai'.
     'llm' => [
-        'provider' => env('LLM_PROVIDER', 'openai'),
+        'provider' => env('LLM_PROVIDER', 'anthropic'),
     ],
 
     'openai' => [

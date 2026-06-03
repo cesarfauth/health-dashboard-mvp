@@ -8,7 +8,7 @@
 
 Acompanhar a própria saúde é difícil porque os dados existem, mas a interpretação é escassa. O **Health Dashboard MVP** resolve isso: o usuário registra três biomarcadores diários (sono, glicose e HRV), e o backend processa esses dados através de uma API de linguagem natural que devolve recomendações práticas de hábitos — sem diagnósticos, sem jargão clínico.
 
-A solução é um monorepo com backend **Laravel 11** em arquitetura em camadas (Controller → Service → Repository) totalmente containerizado, consumido por um app **Expo (React Native + TypeScript)**. A integração com IA é provider-agnóstica — hoje usa **OpenAI (GPT-4o mini)**, mas trocar para Anthropic Claude ou qualquer outro provedor exige apenas uma linha no `.env`, graças ao padrão de Inversão de Dependência aplicado na camada de integração.
+A solução é um monorepo com backend **Laravel 11** em arquitetura em camadas (Controller → Service → Repository) totalmente containerizado, consumido por um app **Expo (React Native + TypeScript)**. A integração com IA é provider-agnóstica — usa **Anthropic Claude (claude-sonnet-4-5)** como provider padrão, mas trocar para OpenAI ou qualquer outro provedor exige apenas uma linha no `.env` (`LLM_PROVIDER=openai`), graças ao padrão de Inversão de Dependência aplicado na camada de integração.
 
 O diferencial implementado é a **Análise de Tendência Temporal**: quando o usuário acumula 3 ou mais registros, o backend calcula deterministicamente os deltas, médias e direção de variação de cada biomarcador em PHP — e entrega esses dados pré-processados à IA para interpretação. Isso elimina alucinação numérica (a IA nunca faz aritmética) e demonstra separação real entre cálculo determinístico e inferência generativa.
 
@@ -21,7 +21,7 @@ O diferencial implementado é a **Análise de Tendência Temporal**: quando o us
 | Mobile | Expo SDK 54 · React Native 0.81 · TypeScript |
 | Backend | Laravel 11.54 · PHP 8.3 · nginx |
 | Banco de dados | MySQL 8 |
-| IA | OpenAI GPT-4o mini (provider-agnóstico via `LlmClientInterface`) |
+| IA | Anthropic Claude (claude-sonnet-4-5, provider-agnóstico via `LlmClientInterface`) |
 | Containerização | Docker · docker-compose |
 | Testes | PHPUnit 11 · Mockery |
 
@@ -115,8 +115,8 @@ graph TD
         AR[(ai_recommendations)]
     end
 
-    subgraph AI ["🤖 OpenAI GPT-4o mini"]
-        CHAT[Chat Completions API\nJSON mode]
+    subgraph AI ["🤖 Anthropic Claude (claude-sonnet-4-5)"]
+        CHAT[Messages API\nJSON mode]
     end
 
     UI --> AX --> CTRL
@@ -308,7 +308,7 @@ A spec pede "Laravel 10+" — escolhi a 11 por ser a versão atual LTS e por tra
 O avaliador especificou separação de camadas. Implementei a Interface + Implementação Concreta com binding no `RepositoryServiceProvider` via `$bindings` — o ponto exato onde o Laravel resolve "qual classe responde a este contrato". O ganho concreto: o `HealthRecordService` não conhece Eloquent e pode ser testado com um mock de repositório em puro PHPUnit, sem banco.
 
 ### Por que a integração LLM é provider-agnóstica?
-O brief especificava Claude, mas a melhor chave disponível era da OpenAI. Em vez de hardcodar um provider, criei a `LlmClientInterface` e dois providers: `OpenAiService` (padrão) e `AnthropicService`. Trocar é uma linha no `.env` (`LLM_PROVIDER=anthropic`). O `ResilientLlmClient` (decorator) centraliza a lógica de fallback — nenhum provider precisa saber que existe um plano B.
+O brief especificava Claude. Em vez de hardcodar o provider, criei a `LlmClientInterface` e dois providers: `AnthropicService` (padrão, `claude-sonnet-4-5`) e `OpenAiService` (alternativa). Trocar é uma linha no `.env` (`LLM_PROVIDER=openai`). O `ResilientLlmClient` (decorator) centraliza a lógica de fallback — nenhum provider precisa saber que existe um plano B.
 
 ### Por que o fallback determinístico?
 O avaliador pode não ter uma API key. Sem o fallback, o app retornaria erro. Com ele, o fluxo completo funciona, a resposta é transparentemente marcada (`source: fallback`) e o log registra o motivo. É uma decisão de resiliência que demonstra maturidade em ambientes de demonstração.
